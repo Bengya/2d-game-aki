@@ -13,30 +13,29 @@ class Player(arcade.Sprite):
     def __init__(self):
         arcade.Sprite.__init__(self, "res/player.png", PLAYER_SCALE)
         self.center_x = 100
-        self.ceter_y = 155
+        self.center_y = 155
         self.speed = 12
         self._jumping = False
 
     
-    @property
-    def Jumping(self):
-        return _jumping
+    
+    def getJumping(self):
+        return self._jumping
 
-    @Jumping.setter
-    def Jumping(self, value):
+
+    def setJumping(self, value):
         self._jumping = value
 
     
     
     def jump(self):
-        if self.center_y == 155:
-            if self.speed == -12:
-                self.speed = 12
-                self._jumping = False
-                return
+        self.center_y = self.center_y + self.speed
+        if self.speed == -12:
+            self.speed = 12
+            self._jumping = False
+            return
+        self.speed -= 1
 
-            self.center = self.center - self.speed
-            self.speed -= 1
 
 
             

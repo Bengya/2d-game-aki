@@ -23,8 +23,7 @@ class GameManager(arcade.Window):
         self.player_list = None
         self.obstacle_list = None
 
-        self.player = Player()
-        self.player.Jumping = False
+        
 
         # Set up the player info
         self.player_sprite = None
@@ -48,9 +47,10 @@ class GameManager(arcade.Window):
         # Set up the player
         # Character image from kenney.nl
         self.obstacle_sprite = obstacle.Obstacle(0.1)
-        self.obstacle_sprite.center_x = 1175
-        self.obstacle_sprite.center_y = 125
         self.obstacle_list.append(self.obstacle_sprite)
+
+        self.player = Player()
+        self.player_list.append(self.player)
 
         # Create the coins
         
@@ -58,8 +58,9 @@ class GameManager(arcade.Window):
         """ Draw everything """
         arcade.start_render()
         self.obstacle_list.draw()
+        self.player.draw()
         arcade.draw_line(0, 100, 1200, 100, arcade.color.BLACK, 2)
-
+        
         texture = arcade.load_texture("res/dirt.png")
         scale = .25
         
@@ -71,7 +72,17 @@ class GameManager(arcade.Window):
         for obstacle in self.obstacle_list:
             obstacle.move()
             
+        if self.player.getJumping():
+            self.player.jump()
+            
         self.obstacle_list.update()
+        self.player_list.update()
+        
+    def on_key_press(self, key, modifiers):
+        """ Called whenever the user presses a key. """
+        if key == arcade.key.SPACE:
+            self.player.setJumping(True)
+            
 def main():
     """ Main method """
     window = GameManager()
