@@ -1,13 +1,18 @@
-import obstacle
 import arcade
 import os
+import random
 
+
+from artificial import CactusJumperGenerator
+from obstacle import Obstacle
 from player import Player
 
 
-SCREEN_WIDTH    = 1200
+NEW_OBSTACLE_PER_FRAME = 2 # %
+SCREEN_WIDTH    = 1500
 SCREEN_HEIGHT   = 500
 
+OBSTACLE_SPEED = 10
 class GameManager(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Sprite Example")
@@ -22,12 +27,14 @@ class GameManager(arcade.Window):
         # Variables that will hold sprite lists
         self.player_list = None
         self.obstacle_list = None
+        self.set_update_rate(1/200)
+        self.gameRunning = True
 
-        
+        self.generation = CactusJumperGenerator()
 
         # Set up the player info
         self.player_sprite = None
-        self.score = 0
+        self.score = 1
 
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
@@ -38,50 +45,91 @@ class GameManager(arcade.Window):
         """ Set up the game and initialize the variables. """
 
         # Sprite lists
+        self.obstacle = Obstacle(OBSTACLE_SPEED)
+        self.generation.obstacle = self.obstacle
+        self.generation.populate()
         self.player_list = arcade.SpriteList()
-        self.obstacle_list = arcade.SpriteList()
 
         # Score
-        self.score = 0
 
         # Set up the player
         # Character image from kenney.nl
-        self.obstacle_sprite = obstacle.Obstacle(0.1)
-        self.obstacle_list.append(self.obstacle_sprite)
 
-        self.player = Player()
-        self.player_list.append(self.player)
+        
+        for sprite in self.generation.population:
+            self.player_list.append(sprite)
+
+        self.fitList = [player.getFittness() for player in self.player_list]
 
         # Create the coins
         
     def on_draw(self):
         """ Draw everything """
         arcade.start_render()
-        self.obstacle_list.draw()
-        self.player.draw()
-        arcade.draw_line(0, 100, 1200, 100, arcade.color.BLACK, 2)
+        self.obstacle.draw()
+        self.player_list.draw()
+        
+        
+        
+        arcade.draw_line(0, 100, SCREEN_WIDTH, 100, arcade.color.BLACK, 2)
         
         texture = arcade.load_texture("res/dirt.png")
         scale = .25
         
-        for i in range(50, 1200, 100):
+        for i in range(50, SCREEN_WIDTH, 100):
             arcade.draw_texture_rectangle(i, 50, scale * texture.width,
                               scale * texture.height, texture, 0)
+                              
+        output = f"Generation: {self.score}"
+        arcade.draw_text(output, SCREEN_WIDTH - 200, 450, arcade.color.WHITE, 14)
+        output2 = str(self.fitList)
+        arcade.draw_text(output2, 100, 450, arcade.color.WHITE, 14)
+        
+        for p in self.player_list:
+            o = str(p.age)
+            arcade.draw_text(o, p.center_x, p.center_y, arcade.color.WHITE, 14)
+        for p in self.player_list:
+            o = str(p.getFittness())
+            arcade.draw_text(o, p.center_x, p.center_y-20, arcade.color.WHITE, 14)
+        
     def update(self, delta_time):
     
-        for obstacle in self.obstacle_list:
-            obstacle.move()
+        # if not self.obstacle_list:
+            # self.obstacle_list.append(Obstacle(OBSTACLE_SPEED))
             
-        if self.player.getJumping():
-            self.player.jump()
+        # elif NEW_OBSTACLE_PER_FRAME > random.randint(0,100) and self.obstacle_list[-1].center_x <= 900:
+            # self.obstacle_list.append(Obstacle(OBSTACLE_SPEED))
+        
+        self.obstacle.move()
+        
+        for player in self.player_list:
+            if player.readyToJump(self.obstacle.center_x):
+                player.jump()
             
-        self.obstacle_list.update()
+        hit_list = arcade.check_for_collision_with_list(self.obstacle, self.player_list)
+        for player in hit_list:
+            player.touched = 100
         self.player_list.update()
+        self.obstacle.update()
+        
+
+            
+        # Loop through each colliding sprite, remove it, and add to the score.
+        
+        if self.obstacle.center_x < 20:
+                self.generation.selection()
+                self.score += 1
+                self.setup()
+        
         
     def on_key_press(self, key, modifiers):
         """ Called whenever the user presses a key. """
         if key == arcade.key.SPACE:
-            self.player.setJumping(True)
+            pass
+            
+            
+    # def endGame(self):
+        
             
 def main():
     """ Main method """
