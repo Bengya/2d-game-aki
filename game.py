@@ -1,5 +1,3 @@
-
-
 import arcade
 import os
 import obstacle
@@ -10,20 +8,21 @@ import obstacle
 file_path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(file_path)
 
+PLAYER_SCALE = 2.3
+
 arcade.open_window(1200, 500, "Drawing Example")
 
 arcade.set_background_color(arcade.color.WHITE)
 
+
+player_sprite = arcade.Sprite("res/player.png", PLAYER_SCALE)
+player_sprite.center_x = 100
+player_sprite.center_y = 155
+
 # Start the render process. This must be done before any drawing commands.
 arcade.start_render()
 
-# Draw a grid
-# Draw vertical lines every 120 pixels
-
-
-# Draw horizontal lines every 200 pixels
-
-arcade.draw_line(0, 100, 1200, 100, arcade.color.BLACK, 2)
+player_sprite.draw()
 
 texture = arcade.load_texture("res/dirt.png")
 scale = .25
