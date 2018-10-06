@@ -2,7 +2,7 @@
 
 import arcade
 import os
-
+import obstacle
 # Set the working directory (where we expect to find files) to the same
 # directory this .py file is in. You can leave this out of your own
 # code, but it is needed to easily run the examples using "python -m"
@@ -31,8 +31,10 @@ scale = .25
 for i in range(50, 1200, 100):
 	arcade.draw_texture_rectangle(i, 50, scale * texture.width,
                               scale * texture.height, texture, 0)
+                              
+                              
 
-
+obstacle = obstacle.Obstacle(0)
 
 # Finish the render.
 # Nothing will be drawn without this.
