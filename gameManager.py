@@ -1,6 +1,10 @@
 import obstacle
 import arcade
 import os
+
+from player import Player
+
+
 SCREEN_WIDTH    = 1200
 SCREEN_HEIGHT   = 500
 
@@ -18,6 +22,9 @@ class GameManager(arcade.Window):
         # Variables that will hold sprite lists
         self.player_list = None
         self.obstacle_list = None
+
+        self.player = Player()
+        self.player.Jumping = False
 
         # Set up the player info
         self.player_sprite = None
